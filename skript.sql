@@ -11,12 +11,32 @@ drop TABLE Rezervace CASCADE CONSTRAINTS;
 drop TABLE Rezervovana CASCADE CONSTRAINTS;
 drop TABLE Vypujcka CASCADE CONSTRAINTS;
 drop TABLE Vypujcena CASCADE CONSTRAINTS;
+drop sequence autor_seq;
+drop sequence zanr_seq;
+drop sequence dilo_seq;
+drop sequence dilo_ck_seq;
+drop sequence uzivatel_seq;
+drop sequence rezervace_seq;
+drop sequence vypujcka_seq;
+
+
+--auto increment ID?ek
+create sequence autor_seq start with 1;
+create sequence zanr_seq start with 1;
+create sequence dilo_seq start with 1;
+create sequence dilo_ck_seq start with 1; --pro casopisy a knihy
+create sequence uzivatel_seq start with 1;
+create sequence uzivatel_cp_seq start with 1; --pro ctenare a pracovniky
+create sequence rezervace_seq start with 1;
+create sequence vypujcka_seq start with 1;
+
 
 --vytvoreni tabulky Autor
 create TABLE Autor (
-    id_autor INTEGER NOT NULL,
+    id_autor number(10) default autor_seq.nextval NOT NULL,
     jmeno VARCHAR(30),
     prijmeni VARCHAR(50),
+    vydavatel varchar(150),
     datum_narozeni DATE,
     datum_umrti DATE,
     narodnost VARCHAR(30),
@@ -26,17 +46,17 @@ create TABLE Autor (
 
 --vytvoreni tabulky Zanr
 create TABLE Zanr (
-    id_zanr INTEGER NOT NULL,
-    nazev_zanru VARCHAR(30),
+    id_zanr number(10) default zanr_seq.nextval NOT NULL,
+    nazev_zanr VARCHAR(30),
     
     CONSTRAINT PK_zanr PRIMARY KEY (id_zanr)
 );
 
 --vytvoreni tabulky Dilo
 create table Dilo (
-  id_dilo INTEGER NOT NULL,
+  id_dilo number(10) default dilo_seq.nextval NOT NULL,
   nazev_dila VARCHAR(50),
-  datum_vydani DATE,
+  rok_vydani NUMBER(4),
   pocet_stran NUMBER(6),
   jazyk VARCHAR(30),
   id_zanr INTEGER NOT NULL,
@@ -47,8 +67,8 @@ create table Dilo (
 
 --vytvoreni tabulky Casopis
 create table Casopis (
-    id_dilo INTEGER NOT NULL,
-    ISSN VARCHAR(9) NOT NULL,
+    id_dilo number(10) default dilo_ck_seq.nextval NOT NULL,
+    ISSN number(8),
     rocnik NUMBER(4),
     cislo NUMBER(3),
     
@@ -59,8 +79,8 @@ create table Casopis (
 
 --vytvoreni tabulky Kniha
 create table Kniha (
-    id_dilo INTEGER NOT NULL,
-    ISBN VARCHAR(13) NOT NULL,
+    id_dilo number(10) default dilo_ck_seq.nextval NOT NULL,
+    ISBN VARCHAR(13),
     
     --osetreni ISSN TODO
     CONSTRAINT FK_id_dilo_kniha FOREIGN KEY (id_dilo) REFERENCES Dilo,
@@ -79,7 +99,7 @@ create table Napsal (
 
 --vytvoreni tabuly Uzivatel
 create table Uzivatel (
-    id_uzivatel INTEGER NOT NULL,
+    id_uzivatel number(10) default uzivatel_seq.nextval NOT NULL,
     jmeno VARCHAR(30),
     prijmeni VARCHAR(50),
     ulice VARCHAR(30),
@@ -94,24 +114,25 @@ create table Uzivatel (
  
 --vytvoreni tabulky Ctenar
 create table Ctenar (
-    id_uzivatel INTEGER NOT NULL,
-
-    CONSTRAINT FK_uzivatel_ctenar FOREIGN KEY (id_uzivatel) REFERENCES Uzivatel,
+    id_uzivatel number(10) default uzivatel_cp_seq.nextval NOT NULL,
+    aktivni NUMBER(1), --boolean neni v oracle, takze nahrada bude 1-true, 0-false
+    
+    CONSTRAINT FK_id_uzivatel_ctenar FOREIGN KEY (id_uzivatel) REFERENCES Uzivatel,
     CONSTRAINT PK_ctenar PRIMARY KEY (id_uzivatel)
 );
 
 --vytvoreni tabulky Pracovnik
 create table Pracovnik (
-   id_uzivatel INTEGER NOT NULL,
+   id_uzivatel number(10) default uzivatel_cp_seq.nextval NOT NULL,
    cislo_uctu VARCHAR(16),
 
-    CONSTRAINT FK_uzivatel_pracovnik FOREIGN KEY (id_uzivatel) REFERENCES Uzivatel,
+    CONSTRAINT FK_id_uzivatel_pracovnik FOREIGN KEY (id_uzivatel) REFERENCES Uzivatel,
     CONSTRAINT PK_pracovnik PRIMARY KEY (id_uzivatel)
 );
 
 --vytvoreni tabulky Rezervace
 create table Rezervace (
-    cislo_rezervace INTEGER NOT NULL,
+    cislo_rezervace number(10) default rezervace_seq.nextval NOT NULL,
     datum_rezervace DATE,
     platnost NUMBER(1), --boolean neni v oracle, takze nahrada bude 1-true, 0-false
     id_uzivatel INTEGER NOT NULL,
@@ -133,8 +154,8 @@ create table Rezervovana (
 
 --vytvoreni tabulky Vypujcka
 create table Vypujcka (
-    cislo_vypujcka INTEGER NOT NULL,
-    datum_vypujcka DATE,
+    cislo_vypujcka number(10) default vypujcka_seq.nextval NOT NULL,
+    datum_vypujcka DATE NOT NULL,
     datum_navrat DATE,
     id_uzivatel INTEGER NOT NULL,
     
@@ -151,3 +172,72 @@ create table Vypujcena (
     CONSTRAINT FK_id_dilo_vypujcena FOREIGN KEY (id_dilo) REFERENCES Dilo,
     CONSTRAINT PK_vypujcena PRIMARY KEY (cislo_vypujcka, id_dilo)
 );
+--vlozeni do tabulky zanr
+insert into Zanr (nazev_zanr) values('Roman');
+insert into Zanr (nazev_zanr) values('Pohadka');
+insert into Zanr (nazev_zanr) values('Fantazy');
+insert into Zanr (nazev_zanr) values('Horor');
+insert into Zanr (nazev_zanr) values('Detektivni');
+insert into Zanr (nazev_zanr) values('Vedecky');
+
+--vlozeni do tabulky autor
+insert into Autor (jmeno, prijmeni, datum_narozeni, datum_umrti, narodnost) values('Jules', 'Verne',date '1828-02-08',date '1905-03-24', 'Francie');
+insert into Autor (jmeno, prijmeni, datum_narozeni, datum_umrti, narodnost) values('Jacob', 'Grimm',date '1785-01-04',date '1863-09-20', 'N?mecko');
+insert into Autor (jmeno, prijmeni, datum_narozeni, datum_umrti, narodnost) values('Wilhelm', 'Grimm',date '1786-02-24',date '1859-12-16', 'N?mecko');
+insert into Autor (jmeno, prijmeni, datum_narozeni, narodnost) values('Stephen', 'King',date '1947-09-21', 'USA');
+insert into Autor (jmeno, prijmeni, datum_narozeni, narodnost) values('Jo', 'Nesbo',date '1960-03-29', 'Norsko');
+insert into Autor (vydavatel, narodnost) values('Czech News Center', 'Ceska Republika');
+
+--vlozeni do tabulky dilo, casopis, kniha
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Jení?ek a Ma?enka', '1812', '40', '?esky', '2');
+insert into Kniha (ISBN) values ('1548658978785');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('To', '1986', '1096', 'Anglicky', '4');
+insert into Kniha (ISBN) values ('8121681651295');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('ABC', '1957', '68', '?esky', '6');
+insert into Casopis (ISSN, Rocnik, Cislo) values ('15987516', '2021', '05');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Sn?hulák', '2007', '520', '?esky', '5');
+insert into Kniha (ISBN) values ('7121353189884');
+
+
+--vlozeni do tabulky napsal
+insert into Napsal values('2',  '1');
+insert into Napsal values('3',  '1');
+insert into Napsal values('4',  '2');
+insert into Napsal values('5',  '3');
+insert into Napsal values('6',  '4');
+
+--vlozeni do tabulky uzivatel, ctenar, pracovnik
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon, email) values('Viktor', 'Novák', 'Záh?ebská', 'Olomouc', '25', '77900', '789654321', 'vnovak@seznam.cz');
+insert into Pracovnik values ('1','026849842/0300');
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon, email) values('Tomáš', 'Krej?í', 'Mozolky', 'Brno', '37', '60100', '798465132', 'tkrej02@seznam.cz');
+insert into Ctenar values ('2','1');
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon, email) values('Stanislav', 'Skop?ík', 'Nám?stí Svobody', 'Brno', '2/2B', '66000', '666666658', 'pusinka555@seznam.cz');
+insert into Ctenar values ('3','1');
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon, email) values('Alice', 'Plachá', 'Orlojská', 'Praha', '755/7C', '12500', '658658658', 'vrtule25@gmail.com');
+insert into Ctenar values ('4','1');
+
+
+--vlozeni do tabulky rezervace
+insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-10', '0', '3');
+insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-26', '0', '1');
+insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-27', '1', '4');
+insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-28', '1', '2');
+insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-30', '1', '2');
+
+--vlozeni do tabulky rezervovana
+insert into Rezervovana values('1', '1');
+insert into Rezervovana values('2', '3');
+insert into Rezervovana values('3', '3');
+insert into Rezervovana values('4', '2');
+insert into Rezervovana values('4', '4');
+
+
+--vlozeni do tabulky vypujcka, vypujcena
+insert into Vypujcka (datum_vypujcka, datum_navrat, id_uzivatel) values(date '2022-03-11', date '2022-03-15', '3');
+insert into Vypujcena values('1', '1');
+insert into Vypujcka (datum_vypujcka, id_uzivatel) values(date '2022-03-27', '1');
+insert into Vypujcena values('2', '3');
+
+
+
+
