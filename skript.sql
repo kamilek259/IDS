@@ -16,6 +16,7 @@ drop sequence zanr_seq;
 drop sequence dilo_seq;
 drop sequence dilo_ck_seq;
 drop sequence uzivatel_seq;
+drop sequence uzivatel_cp_seq;
 drop sequence rezervace_seq;
 drop sequence vypujcka_seq;
 
@@ -106,7 +107,9 @@ create table Uzivatel (
     mesto VARCHAR(30),
     cislo_popisne VARCHAR(10),
     psc NUMBER(5),
-    telefon varchar(10),
+    telefon1 varchar(13),
+    telefon2 varchar(10),
+    telefon3 varchar(10),
     email varchar(100),
     
     CONSTRAINT PK_uzivatel PRIMARY KEY (id_uzivatel)
@@ -115,7 +118,7 @@ create table Uzivatel (
 --vytvoreni tabulky Ctenar
 create table Ctenar (
     id_uzivatel number(10) default uzivatel_cp_seq.nextval NOT NULL,
-    aktivni NUMBER(1), --boolean neni v oracle, takze nahrada bude 1-true, 0-false
+    aktivni char(1), --boolean neni v oracle, takze nahrada bude Y-true, N-false
     
     CONSTRAINT FK_id_uzivatel_ctenar FOREIGN KEY (id_uzivatel) REFERENCES Uzivatel,
     CONSTRAINT PK_ctenar PRIMARY KEY (id_uzivatel)
@@ -134,7 +137,7 @@ create table Pracovnik (
 create table Rezervace (
     cislo_rezervace number(10) default rezervace_seq.nextval NOT NULL,
     datum_rezervace DATE,
-    platnost NUMBER(1), --boolean neni v oracle, takze nahrada bude 1-true, 0-false
+    platnost char(1), --boolean neni v oracle, takze nahrada bude Y-true, N-false
     id_uzivatel INTEGER NOT NULL,
 
     
@@ -182,20 +185,20 @@ insert into Zanr (nazev_zanr) values('Vedecky');
 
 --vlozeni do tabulky autor
 insert into Autor (jmeno, prijmeni, datum_narozeni, datum_umrti, narodnost) values('Jules', 'Verne',date '1828-02-08',date '1905-03-24', 'Francie');
-insert into Autor (jmeno, prijmeni, datum_narozeni, datum_umrti, narodnost) values('Jacob', 'Grimm',date '1785-01-04',date '1863-09-20', 'N?mecko');
-insert into Autor (jmeno, prijmeni, datum_narozeni, datum_umrti, narodnost) values('Wilhelm', 'Grimm',date '1786-02-24',date '1859-12-16', 'N?mecko');
+insert into Autor (jmeno, prijmeni, datum_narozeni, datum_umrti, narodnost) values('Jacob', 'Grimm',date '1785-01-04',date '1863-09-20', 'Nemecko');
+insert into Autor (jmeno, prijmeni, datum_narozeni, datum_umrti, narodnost) values('Wilhelm', 'Grimm',date '1786-02-24',date '1859-12-16', 'Nemecko');
 insert into Autor (jmeno, prijmeni, datum_narozeni, narodnost) values('Stephen', 'King',date '1947-09-21', 'USA');
 insert into Autor (jmeno, prijmeni, datum_narozeni, narodnost) values('Jo', 'Nesbo',date '1960-03-29', 'Norsko');
 insert into Autor (vydavatel, narodnost) values('Czech News Center', 'Ceska Republika');
 
 --vlozeni do tabulky dilo, casopis, kniha
-insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Jení?ek a Ma?enka', '1812', '40', '?esky', '2');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Jenícek a Marenka', '1812', '40', 'Cesky', '2');
 insert into Kniha (ISBN) values ('1548658978785');
 insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('To', '1986', '1096', 'Anglicky', '4');
 insert into Kniha (ISBN) values ('8121681651295');
-insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('ABC', '1957', '68', '?esky', '6');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('ABC', '1957', '68', 'Cesky', '6');
 insert into Casopis (ISSN, Rocnik, Cislo) values ('15987516', '2021', '05');
-insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Sn?hulák', '2007', '520', '?esky', '5');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Snehulák', '2007', '520', 'Cesky', '5');
 insert into Kniha (ISBN) values ('7121353189884');
 
 
@@ -207,22 +210,22 @@ insert into Napsal values('5',  '3');
 insert into Napsal values('6',  '4');
 
 --vlozeni do tabulky uzivatel, ctenar, pracovnik
-insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon, email) values('Viktor', 'Novák', 'Záh?ebská', 'Olomouc', '25', '77900', '789654321', 'vnovak@seznam.cz');
-insert into Pracovnik values ('1','026849842/0300');
-insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon, email) values('Tomáš', 'Krej?í', 'Mozolky', 'Brno', '37', '60100', '798465132', 'tkrej02@seznam.cz');
-insert into Ctenar values ('2','1');
-insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon, email) values('Stanislav', 'Skop?ík', 'Nám?stí Svobody', 'Brno', '2/2B', '66000', '666666658', 'pusinka555@seznam.cz');
-insert into Ctenar values ('3','1');
-insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon, email) values('Alice', 'Plachá', 'Orlojská', 'Praha', '755/7C', '12500', '658658658', 'vrtule25@gmail.com');
-insert into Ctenar values ('4','1');
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Viktor', 'Novák', 'Záhrebská', 'Olomouc', '25', '77900', '789654321', 'vnovak@seznam.cz');
+insert into Pracovnik (cislo_uctu) values ('026849842/0300');
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Tomáš', 'Krejcí', 'Mozolky', 'Brno', '37', '60100', '798465132', 'tkrej02@seznam.cz');
+insert into Ctenar (aktivni) values ('Y');
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Stanislav', 'Skopcík', 'Námestí Svobody', 'Brno', '2/2B', '66000', '666666658', 'pusinka555@seznam.cz');
+insert into Ctenar (aktivni) values ('Y');
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Alice', 'Plachá', 'Orlojská', 'Praha', '755/7C', '12500', '658658658', 'vrtule25@gmail.com');
+insert into Ctenar (aktivni) values ('Y');
 
 
 --vlozeni do tabulky rezervace
-insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-10', '0', '3');
-insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-26', '0', '1');
-insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-27', '1', '4');
-insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-28', '1', '2');
-insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-30', '1', '2');
+insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-10', 'N', '3');
+insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-26', 'N', '1');
+insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-27', 'Y', '4');
+insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-28', 'Y', '2');
+insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-30', 'Y', '2');
 
 --vlozeni do tabulky rezervovana
 insert into Rezervovana values('1', '1');
