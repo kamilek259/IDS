@@ -242,7 +242,3 @@ insert into Vypujcka (datum_vypujcka, id_uzivatel) values(date '2022-03-27', '1'
 insert into Vypujcena values('2', '3');
 
 
-
-
-
-
