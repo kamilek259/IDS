@@ -73,7 +73,7 @@ create table Casopis (
     rocnik NUMBER(4),
     cislo NUMBER(3),
     
-    --osetreni ISSN TODO
+    CONSTRAINT ISSN_format CHECK (REGEXP_LIKE(ISSN,'[0-9]{8}','i')),
     CONSTRAINT FK_id_dilo_casopis FOREIGN KEY (id_dilo) REFERENCES Dilo,
     CONSTRAINT PK_casopis PRIMARY KEY (id_dilo, ISSN)
 );
@@ -83,7 +83,7 @@ create table Kniha (
     id_dilo number(10) default dilo_ck_seq.nextval NOT NULL,
     ISBN VARCHAR(13),
     
-    --osetreni ISSN TODO
+    CONSTRAINT ISBN_format CHECK (REGEXP_LIKE(ISBN,'[0-9]{13}','i')),
     CONSTRAINT FK_id_dilo_kniha FOREIGN KEY (id_dilo) REFERENCES Dilo,
     CONSTRAINT PK_kniha PRIMARY KEY (id_dilo, ISBN)
 );
