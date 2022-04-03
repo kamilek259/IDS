@@ -21,7 +21,7 @@ drop sequence rezervace_seq;
 drop sequence vypujcka_seq;
 
 
---auto increment ID?ek
+--auto increment IDcek
 create sequence autor_seq start with 1;
 create sequence zanr_seq start with 1;
 create sequence dilo_seq start with 1;
@@ -240,6 +240,8 @@ insert into Vypujcka (datum_vypujcka, datum_navrat, id_uzivatel) values(date '20
 insert into Vypujcena values('1', '1');
 insert into Vypujcka (datum_vypujcka, id_uzivatel) values(date '2022-03-27', '1');
 insert into Vypujcena values('2', '3');
+
+
 
 
 
