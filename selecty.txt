@@ -1,0 +1,15 @@
+SELECTY, udaje v zavorce rikaji, co chceme zobrazit
+--dotazy pro 2 tabulky
+1)Jake platne rezervace ma uzivatel Viktor Novak?
+(id_uzivatele, jmeno, prijmeni, cislo_rezervace, datum_rezervace)
+2)Odkud jsou uzivatele s platnou rezervaci? (mesto)
+
+--dotaz pro 3 tabulky
+3)Co napsal Jo Nesbo a má to více jak 500 stran? (jmeno, prijmeni, nazev dila, pocet stran)
+
+--Agregace + GROUP BY
+4)Kolik platnych maji rezervaci jednotlivi uzivatele?
+(id_uzivatele, jmeno, prijmeni, pocet_rezervaci)
+5)Kolikrat byla dila napsana v cestine vypujena? (ID-dila, nazev dila, pocet)
+6)
+7)
