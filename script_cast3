@@ -261,3 +261,10 @@ WHERE U.id_uzivatel = R.id_uzivatel AND R.platnost='Y';
 SELECT A.jmeno, A.prijmeni, D.nazev_dila,D.pocet_stran
 FROM Autor A, Dilo D, Napsal N
 WHERE A.id_autor=N.id_autor AND N.id_dilo=D.id_dilo AND A.jmeno='Jo' AND A.prijmeni='Nesbo' AND D.pocet_stran>500;
+
+--4)Kolik platnych maji rezervaci jednotlivi uzivatele? (id_uzivatele, jmeno, prijmeni, pocet_rezervaci)
+SELECT U.id_uzivatel, U.jmeno, U.prijmeni, COUNT(*) pocet
+FROM Uzivatel U, Rezervace R
+WHERE U.id_uzivatel = R.id_uzivatel AND R.platnost='Y'
+GROUP BY U.id_uzivatel, U.jmeno, U.prijmeni; 
+
