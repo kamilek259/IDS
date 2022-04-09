@@ -192,15 +192,15 @@ insert into Autor (jmeno, prijmeni, datum_narozeni, narodnost) values('Jo', 'Nes
 insert into Autor (vydavatel, narodnost) values('Czech News Center', 'Ceska Republika');
 
 --vlozeni do tabulky dilo, casopis, kniha
-insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Jenicek a Marenka', '1812', '40', 'Cesky', '2');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Jenicek a Marenka', '1812', '40', 'cesky', '2');
 insert into Kniha (ISBN) values ('1548658978785');
-insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('To', '1986', '1096', 'Anglicky', '4');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('To', '1986', '1096', 'anglicky', '4');
 insert into Kniha (ISBN) values ('8121681651295');
-insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('ABC', '1957', '68', 'Cesky', '6');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('ABC', '1957', '68', 'cesky', '6');
 insert into Casopis (ISSN, Rocnik, Cislo) values ('15987516', '2021', '05');
-insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Snehulak', '2007', '520', 'Cesky', '5');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Snehulak', '2007', '520', 'cesky', '5');
 insert into Kniha (ISBN) values ('7121353189884');
-insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Cervenka nese smrt', '2000', '470', 'Anglicky', '5');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Cervenka nese smrt', '2000', '470', 'anglicky', '5');
 insert into Kniha (ISBN) values ('8024315199764');
 
 --vlozeni do tabulky napsal
@@ -268,3 +268,8 @@ FROM Uzivatel U, Rezervace R
 WHERE U.id_uzivatel = R.id_uzivatel AND R.platnost='Y'
 GROUP BY U.id_uzivatel, U.jmeno, U.prijmeni; 
 
+--5)Kolikrat byla dila napsana v cestine vypujena? (ID-dila, nazev dila, pocet)
+SELECT D.id_dilo, D.nazev_dila, COUNT(*) pocet
+FROM Dilo D, Vypujcena Vna, Vypujcka Vka
+WHERE D.id_dilo=Vna.ID_dilo AND Vka.cislo_vypujcka=Vna.cislo_vypujcka AND D.jazyk='cesky'
+GROUP BY D.id_dilo, D.nazev_dila;
