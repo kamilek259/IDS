@@ -192,13 +192,13 @@ insert into Autor (jmeno, prijmeni, datum_narozeni, narodnost) values('Jo', 'Nes
 insert into Autor (vydavatel, narodnost) values('Czech News Center', 'Ceska Republika');
 
 --vlozeni do tabulky dilo, casopis, kniha
-insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Jenícek a Marenka', '1812', '40', 'Cesky', '2');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Jenicek a Marenka', '1812', '40', 'Cesky', '2');
 insert into Kniha (ISBN) values ('1548658978785');
 insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('To', '1986', '1096', 'Anglicky', '4');
 insert into Kniha (ISBN) values ('8121681651295');
 insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('ABC', '1957', '68', 'Cesky', '6');
 insert into Casopis (ISSN, Rocnik, Cislo) values ('15987516', '2021', '05');
-insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Snehulák', '2007', '520', 'Cesky', '5');
+insert into Dilo (nazev_dila, rok_vydani, pocet_stran, jazyk, id_zanr) values('Snehulak', '2007', '520', 'Cesky', '5');
 insert into Kniha (ISBN) values ('7121353189884');
 
 
@@ -210,13 +210,13 @@ insert into Napsal values('5',  '3');
 insert into Napsal values('6',  '4');
 
 --vlozeni do tabulky uzivatel, ctenar, pracovnik
-insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Viktor', 'Novák', 'Záhrebská', 'Olomouc', '25', '77900', '789654321', 'vnovak@seznam.cz');
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Viktor', 'Novak', 'Zahrebská', 'Olomouc', '25', '77900', '789654321', 'vnovak@seznam.cz');
 insert into Pracovnik (cislo_uctu) values ('026849842/0300');
-insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Tomáš', 'Krejcí', 'Mozolky', 'Brno', '37', '60100', '798465132', 'tkrej02@seznam.cz');
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Tomas', 'Krejci', 'Mozolky', 'Brno', '37', '60100', '798465132', 'tkrej02@seznam.cz');
 insert into Ctenar (aktivni) values ('Y');
-insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Stanislav', 'Skopcík', 'Námestí Svobody', 'Brno', '2/2B', '66000', '666666658', 'pusinka555@seznam.cz');
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Stanislav', 'Skopcik', 'Namesti Svobody', 'Brno', '2/2B', '66000', '666666658', 'pusinka555@seznam.cz');
 insert into Ctenar (aktivni) values ('Y');
-insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Alice', 'Plachá', 'Orlojská', 'Praha', '755/7C', '12500', '658658658', 'vrtule25@gmail.com');
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Alice', 'Placha', 'Orlojska', 'Praha', '755/7C', '12500', '658658658', 'vrtule25@gmail.com');
 insert into Ctenar (aktivni) values ('Y');
 
 
@@ -226,6 +226,7 @@ insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022
 insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-27', 'Y', '4');
 insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-28', 'Y', '2');
 insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-30', 'Y', '2');
+insert into Rezervace (datum_rezervace, platnost, id_uzivatel) values(date '2022-03-30', 'Y', '1');
 
 --vlozeni do tabulky rezervovana
 insert into Rezervovana values('1', '1');
@@ -240,4 +241,17 @@ insert into Vypujcka (datum_vypujcka, datum_navrat, id_uzivatel) values(date '20
 insert into Vypujcena values('1', '1');
 insert into Vypujcka (datum_vypujcka, id_uzivatel) values(date '2022-03-27', '1');
 insert into Vypujcena values('2', '3');
+
+
+--3.cast dotazy SELECT; udaje v zavorce rikaji, co chceme zobrazit
+
+--1)Jake platne rezervace ma uzivatel Viktor Novak? (id_uzivatele, jmeno, prijmeni, cislo_rezervace, datum_rezervace)
+SELECT U.id_uzivatel, U.jmeno, U.prijmeni, R.cislo_rezervace, R.datum_rezervace
+FROM Uzivatel U, Rezervace R
+WHERE U.id_uzivatel = R.id_uzivatel AND U.jmeno = 'Viktor' AND U.prijmeni='Novak' AND R.platnost='Y';
+
+--2)Odkud jsou uzivatele s platnou rezervaci (mesto)
+SELECT DISTINCT U.mesto
+FROM Uzivatel U, Rezervace R
+WHERE U.id_uzivatel = R.id_uzivatel AND R.platnost='Y';
 
