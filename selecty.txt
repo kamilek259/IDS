@@ -11,5 +11,9 @@ SELECTY, udaje v zavorce rikaji, co chceme zobrazit
 4)Kolik platnych maji rezervaci jednotlivi uzivatele?
 (id_uzivatele, jmeno, prijmeni, pocet_rezervaci)
 5)Kolikrat byla dila napsana v cestine vypujena? (ID-dila, nazev dila, pocet)
-6)
-7)
+
+--predikát IN
+6)Kteri uzivatele vytvorili rezervaci 30.brezna.2022? (jmeno, prijmeni)
+
+--predikát EXISTS
+7)Kteri uzivatele si jeste nic nerezervovali? (jmeno, prijmeni)
