@@ -220,6 +220,8 @@ insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon
 insert into Ctenar (aktivni) values ('Y');
 insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Alice', 'Placha', 'Orlojska', 'Praha', '755/7C', '12500', '658658658', 'vrtule25@gmail.com');
 insert into Ctenar (aktivni) values ('Y');
+insert into Uzivatel (jmeno, prijmeni, ulice, mesto, cislo_popisne, psc, telefon1, email) values('Marie', 'Tmava', 'Lehka', 'Brno', '96', '66035', '651359881', 'maruska55@gmail.com');
+insert into Ctenar (aktivni) values ('Y');
 
 
 --vlozeni do tabulky rezervace
@@ -273,3 +275,21 @@ SELECT D.id_dilo, D.nazev_dila, COUNT(*) pocet
 FROM Dilo D, Vypujcena Vna, Vypujcka Vka
 WHERE D.id_dilo=Vna.ID_dilo AND Vka.cislo_vypujcka=Vna.cislo_vypujcka AND D.jazyk='cesky'
 GROUP BY D.id_dilo, D.nazev_dila;
+
+--6)Kteri uzivatele vytvorili rezervaci 30.brezna.2022? (jmeno, prijmeni)
+SELECT jmeno, prijmeni
+FROM Uzivatel U
+WHERE U.id_uzivatel IN
+        (SELECT id_uzivatel FROM Rezervace
+        WHERE datum_rezervace = date '2022-03-30');
+               
+--7)Kteri uzivatele si jeste nic nerezervovali? (jmeno, prijmeni)
+SELECT DISTINCT U.jmeno, U.prijmeni
+FROM Uzivatel U, Rezervace R
+WHERE NOT EXISTS 
+    (SELECT R.* FROM Rezervace R 
+    WHERE U.id_uzivatel=R.id_uzivatel);
+
+
+
+
