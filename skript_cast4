@@ -250,14 +250,33 @@ insert into Vypujcena values('2', '3');
 
 
 --4. cast
---Triggery jsou nefunkcni
 --Trigger 1 - Po smazani autora se odstrani i dila, ktera napsal (pouze pokud je napsal sam)
---CREATE OR REPLACE TRIGGER deleted_autor
-  --  AFTER DELETE ON Autor
-   -- FOR EACH ROW
---BEGIN
- --   DELETE FROM Napsal N WHERE N.id_autor = :old.id_autor;
---END;
+CREATE OR REPLACE TRIGGER deleted_autor
+    AFTER DELETE ON Autor
+    FOR EACH ROW
+BEGIN
+    DELETE FROM Napsal N WHERE N.id_autor = :old.id_autor;
+END;
+
+
+--TESTOVANI ODSTRANENI AUTORA
+
+--DEL_AUTOR(B)
+SELECT id_autor, jmeno, prijmeni, datum_narozeni, datum_umrti, id_dilo, nazev_dila AS TableBefore
+FROM Autor
+NATURAL JOIN napsal
+NATURAL JOIN dilo;
+
+DELETE FROM Autor WHERE jmeno='Jacob' AND prijmeni='Grimm';
+DELETE FROM Autor WHERE jmeno='Stephen' AND prijmeni='King';
+
+--DEL_AUTOR(A)
+SELECT id_autor, jmeno, prijmeni, datum_narozeni, datum_umrti, id_dilo, nazev_dila AS TableBefore
+FROM Autor
+NATURAL JOIN napsal
+NATURAL JOIN dilo;
+
+--TESTOVANI ODSTRANENI AUTORA
 
 
 --Trigger 2 - Po odstaneni uzivatele se nastavi na NULL v tabulkach Rezervace a Ctenar/Pracovnik, popripade vypujcka
