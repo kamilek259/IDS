@@ -138,7 +138,8 @@ create table Rezervace (
     cislo_rezervace number(10) default rezervace_seq.nextval NOT NULL,
     datum_rezervace DATE,
     platnost char(1), --boolean neni v oracle, takze nahrada bude Y-true, N-false
-    id_uzivatel INTEGER NOT NULL,
+    --id_uzivatel INTEGER NOT NULL, --OLD
+    id_uzivatel INTEGER, --NASTAVENI NA NULL JE POTREBA PRI ODSTRANENI UZIVATELE
 
     
     CONSTRAINT FK_uzivatel_rezervace FOREIGN KEY (id_uzivatel) REFERENCES Uzivatel,
@@ -160,7 +161,8 @@ create table Vypujcka (
     cislo_vypujcka number(10) default vypujcka_seq.nextval NOT NULL,
     datum_vypujcka DATE NOT NULL,
     datum_navrat DATE,
-    id_uzivatel INTEGER NOT NULL,
+    --id_uzivatel INTEGER NOT NULL, --OLD
+    id_uzivatel INTEGER, --NASTAVENI NA NULL JE POTREBA PRI ODSTRANENI UZIVATELE
     
     CONSTRAINT FK_id_uzivatel_vypujcka FOREIGN KEY (id_uzivatel) REFERENCES Uzivatel,
     CONSTRAINT PK_vypujcka PRIMARY KEY (cislo_vypujcka)
@@ -246,9 +248,6 @@ insert into Vypujcena values('1', '1');
 insert into Vypujcka (datum_vypujcka, id_uzivatel) values(date '2022-03-27', '1');
 insert into Vypujcena values('2', '3');
 
-
-
-
 --4. cast
 --Trigger 1 - Po smazani autora se odstrani i dila, ktera napsal (pouze pokud je napsal sam)
 CREATE OR REPLACE TRIGGER deleted_autor
@@ -257,27 +256,6 @@ CREATE OR REPLACE TRIGGER deleted_autor
 BEGIN
     DELETE FROM Napsal N WHERE N.id_autor = :old.id_autor;
 END;
-
-
---TESTOVANI ODSTRANENI AUTORA
-
---DEL_AUTOR(B)
-SELECT id_autor, jmeno, prijmeni, datum_narozeni, datum_umrti, id_dilo, nazev_dila AS TableBefore
-FROM Autor
-NATURAL JOIN napsal
-NATURAL JOIN dilo;
-
-DELETE FROM Autor WHERE jmeno='Jacob' AND prijmeni='Grimm';
-DELETE FROM Autor WHERE jmeno='Stephen' AND prijmeni='King';
-
---DEL_AUTOR(A)
-SELECT id_autor, jmeno, prijmeni, datum_narozeni, datum_umrti, id_dilo, nazev_dila AS TableBefore
-FROM Autor
-NATURAL JOIN napsal
-NATURAL JOIN dilo;
-
---TESTOVANI ODSTRANENI AUTORA
-
 
 --Trigger 2 - Po odstaneni uzivatele se nastavi na NULL v tabulkach Rezervace a Ctenar/Pracovnik, popripade vypujcka
 CREATE OR REPLACE TRIGGER deleted_uzivatel
@@ -290,8 +268,42 @@ BEGIN
     UPDATE Vypujcka SET id_uzivatel = NULL WHERE id_uzivatel = :old.id_uzivatel;
 END;
 
---UKAZKA
+--TESTOVANI ODSTRANENI AUTORA
+
+--DEL_AUTOR(B)
+SELECT id_autor, jmeno, prijmeni, datum_narozeni, datum_umrti, id_dilo, nazev_dila
+FROM Autor
+NATURAL JOIN napsal
+NATURAL JOIN dilo;
+
+DELETE FROM Autor WHERE jmeno='Jacob' AND prijmeni='Grimm';
+DELETE FROM Autor WHERE jmeno='Stephen' AND prijmeni='King';
+
+--DEL_AUTOR(A)
+
+SELECT id_autor, jmeno, prijmeni, datum_narozeni, datum_umrti, id_dilo, nazev_dila
+FROM Autor
+NATURAL JOIN napsal
+NATURAL JOIN dilo;
+
+--TESTOVANI ODSTRANENI AUTORA
+
+--TESTOVANI ODSTRANENI UZIVATELE
+
+--DEL_USER(B)
+SELECT id_uzivatel, jmeno, prijmeni
+FROM Uzivatel;
+--VYP_NONDEL(B)
+SELECT id_uzivatel, cislo_vypujcka
+FROM Vypujcka;
+
 DELETE FROM Uzivatel WHERE jmeno='Stanislav' AND prijmeni='Skopcik';
 
+--DEL_USER(A)
+SELECT id_uzivatel, jmeno, prijmeni
+FROM Uzivatel;
+--VYP_NONDEL(A)
+SELECT id_uzivatel, cislo_vypujcka
+FROM Vypujcka;
 
-
+--TESTOVANI ODSTRANENI UZIVATELE
