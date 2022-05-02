@@ -195,7 +195,7 @@ CREATE OR REPLACE TRIGGER deleted_autor
 BEGIN
     DELETE FROM Napsal N WHERE N.id_autor = :old.id_autor;
 END;
-
+/
 --Trigger 2 - Po odstaneni uzivatele se nastavi na NULL v tabulkach Rezervace a Ctenar/Pracovnik, popripade vypujcka
 CREATE OR REPLACE TRIGGER deleted_uzivatel
     AFTER DELETE ON Uzivatel
@@ -206,7 +206,7 @@ BEGIN
     DELETE FROM Pracovnik WHERE id_uzivatel = :old.id_uzivatel;
     UPDATE Vypujcka SET id_uzivatel = NULL WHERE id_uzivatel = :old.id_uzivatel;
 END;
-
+/
 -----------------------PROCEDURY---------------------
 --Procedure 1 - Pridani noveho telefonu
 CREATE OR REPLACE PROCEDURE PridatTelefon(uzivatelID NUMBER,telefonNum VARCHAR)
@@ -261,8 +261,8 @@ BEGIN
         WHERE id_uzivatel = uzivatelID;
     END IF;
 END;
-
---Procedure 1 - Prodlouzeni vsech vypujcek
+/
+--Procedure 2 - Prodlouzeni vsech vypujcek
 CREATE OR REPLACE PROCEDURE ProdluzVsechnyVypujcky(dayCount NUMBER)
     IS
 BEGIN
@@ -282,7 +282,7 @@ BEGIN
             CLOSE VypujckaCursor;
         END;
 END;
-
+/
 ---------------------NAPLNENI TABULEK UKAZKOVYMI DATY----------------------
 
 --vlozeni do tabulky zanr
@@ -405,6 +405,7 @@ BEGIN
     PridatTelefon(1,'658658670'); --nastavi Telefon3
     PridatTelefon(1,'658658671'); --neudela nic, neni totiz misto pro dalsi telefony
 END;
+/
 --NEWPHONE(AFTER)
 SELECT *
     FROM Uzivatel;
@@ -423,7 +424,7 @@ BEGIN
     ProdluzVsechnyVypujcky(7); --Stejne jako predchozi, jenom o 7 dnu
     -- (ak je vypujcka uz vracena (datum navrat = NULL) pak nebude prodlouzena)
 END;
-
+/
 --PRODLUZENI VYPJUCKY(AFTER)
 SELECT *
     FROM VYPUJCKA;
@@ -436,6 +437,7 @@ WHERE A.id_autor = N.id_autor
 GROUP BY A.id_autor, A.jmeno, A.prijmeni
 HAVING COUNT(N.id_dilo)>1
 ORDER BY A.prijmeni;
+/
 --vypis
 SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 
@@ -450,6 +452,7 @@ WHERE A.id_autor = N.id_autor
 GROUP BY A.id_autor, A.jmeno, A.prijmeni
 HAVING COUNT(N.id_dilo)>1
 ORDER BY A.prijmeni;
+/
 --vypis
 SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 
