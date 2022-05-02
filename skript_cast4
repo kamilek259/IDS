@@ -22,7 +22,7 @@ drop sequence rezervace_seq;
 drop sequence vypujcka_seq;
 drop trigger deleted_autor;
 drop trigger deleted_uzivatel;
-drop index autor_prijmeni;
+drop index napsal_index;
 
 
 ---------------------CREATE SQEUENCE----------------------
@@ -402,7 +402,7 @@ ORDER BY A.prijmeni;
 SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 
 --INDEX pro prijmeni (rychlejsi vyhledavani)
-CREATE INDEX autor_prijmeni ON Autor (prijmeni);
+CREATE INDEX napsal_index ON Napsal (id_autor);
 
 --znovu vytvoreni explain plan
 EXPLAIN PLAN FOR
