@@ -205,6 +205,61 @@ BEGIN
     UPDATE Vypujcka SET id_uzivatel = NULL WHERE id_uzivatel = :old.id_uzivatel;
 END;
 
+-----------------------PROCEDURY---------------------
+--Procedure 1 - Pridani noveho telefonu
+CREATE OR REPLACE PROCEDURE PridatTelefon(uzivatelID NUMBER,telefonNum VARCHAR)
+    IS
+    tel1 VARCHAR(10);
+    tel2 VARCHAR(10);
+    tel3 VARCHAR(10);
+BEGIN
+    BEGIN
+        SELECT telefon1
+        INTO tel1
+        FROM Uzivatel
+        WHERE id_uzivatel = uzivatelID;
+        EXCEPTION --osetreni vyjimky1
+        WHEN NO_DATA_FOUND THEN
+        tel1 := NULL;
+    END;
+
+    BEGIN
+        SELECT telefon2
+        INTO tel2
+        FROM Uzivatel
+        WHERE id_uzivatel = uzivatelID;
+        EXCEPTION --osetreni vyjimky2
+        WHEN NO_DATA_FOUND THEN
+        tel2 := NULL;
+    END;
+
+    BEGIN
+        SELECT telefon3
+        INTO tel3
+        FROM Uzivatel
+        WHERE id_uzivatel = uzivatelID;
+        EXCEPTION --osetreni vyjimky3
+        WHEN NO_DATA_FOUND THEN
+        tel3 := NULL;
+    END;
+
+    IF (tel1 = telefonNum) OR (tel2 = telefonNum) OR (tel3 = telefonNum) THEN
+        RETURN;
+    ELSIF (tel1 IS NULL) THEN
+        UPDATE Uzivatel
+        SET telefon1 = telefonNum
+        WHERE id_uzivatel = uzivatelID;
+    ELSIF (tel2 IS NULL) THEN
+        UPDATE Uzivatel
+        SET telefon2 = telefonNum
+        WHERE id_uzivatel = uzivatelID;
+    ELSIF (tel3 IS NULL) THEN
+        UPDATE Uzivatel
+        SET telefon3 = telefonNum
+        WHERE id_uzivatel = uzivatelID;
+    END IF;
+END;
+
 ---------------------NAPLNENI TABULEK UKAZKOVYMI DATY----------------------
 
 --vlozeni do tabulky zanr
@@ -280,10 +335,9 @@ insert into Vypujcena values('2', '3');
 
 ---------------------TESTOVANI TRIGGERU----------------------
 
-
 --TESTOVANI ODSTRANENI AUTORA
 
---DEL_AUTOR(B)
+--DEL_AUTOR(BEFORE)
 SELECT id_autor, jmeno, prijmeni, datum_narozeni, datum_umrti, id_dilo, nazev_dila
 FROM Autor
 NATURAL JOIN napsal
@@ -292,34 +346,46 @@ NATURAL JOIN dilo;
 DELETE FROM Autor WHERE jmeno='Jacob' AND prijmeni='Grimm';
 DELETE FROM Autor WHERE jmeno='Stephen' AND prijmeni='King';
 
---DEL_AUTOR(A)
-
+--DEL_AUTOR(AFTER)
 SELECT id_autor, jmeno, prijmeni, datum_narozeni, datum_umrti, id_dilo, nazev_dila
 FROM Autor
 NATURAL JOIN napsal
 NATURAL JOIN dilo;
 
---TESTOVANI ODSTRANENI AUTORA
-
 --TESTOVANI ODSTRANENI UZIVATELE
 
---DEL_USER(B)
+--DEL_USER(BEFORE)
 SELECT id_uzivatel, jmeno, prijmeni
 FROM Uzivatel;
---VYP_NONDEL(B)
+--VYP_NONDEL(BEFORE)
 SELECT id_uzivatel, cislo_vypujcka
 FROM Vypujcka;
 
 DELETE FROM Uzivatel WHERE jmeno='Stanislav' AND prijmeni='Skopcik';
 
---DEL_USER(A)
+--DEL_USER(AFTER)
 SELECT id_uzivatel, jmeno, prijmeni
 FROM Uzivatel;
---VYP_NONDEL(A)
-SELECT id_uzivatel, cislo_vypujcka
+--VYP_NONDEL(AFTER)
+SELECT id_uzivatel, cislo_vypujcka --ID uzivatele v tabulce Vypujcka se nastavi na NULL protoze uzivatel uz neexistuje
 FROM Vypujcka;
 
---TESTOVANI ODSTRANENI UZIVATELE
+---------------------TESTOVANI PROCEDUR----------------------
+
+--TESTOVANI PRIDANI TELEFONU
+--NEWPHONE(BEFORE)
+SELECT *
+    FROM Uzivatel;
+BEGIN
+    PridatTelefon(1,'658658669'); --nastavi Telefon2
+    PridatTelefon(1,'658658669'); --neudela nic protoze to uz je Telefon2
+    PridatTelefon(1,'658658670'); --nastavi Telefon3
+    PridatTelefon(1,'658658671'); --neudela nic, neni totiz misto pro dalsi telefony
+END;
+--NEWPHONE(AFTER)
+SELECT *
+    FROM Uzivatel;
+--TESTOVANI PRIDANI TELEFONU
 
 ---------------------EXPLAIN PLAN----------------------
 --Kteri autori napsali vice nez jednu knihu a kolik jich napsali?
