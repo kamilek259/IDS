@@ -428,6 +428,7 @@ END;
 --PRODLUZENI VYPJUCKY(AFTER)
 SELECT *
     FROM VYPUJCKA;
+    
 ---------------------EXPLAIN PLAN----------------------
 --Kteri autori napsali vice nez jednu knihu a kolik jich napsali?
 EXPLAIN PLAN FOR
@@ -500,9 +501,7 @@ SELECT *
 FROM AutorMv WHERE jmeno IS NOT NULL;
 --Vlozili jsme noveho autora, no my porad vidime jenom 5 autoru
 
-BEGIN
-    DBMS_MVIEW.REFRESH('AutorMv');
-END;
+EXEC DBMS_MVIEW.REFRESH('AutorMv');
 
 --SeeAuthorList(AfterRefresh)
 SELECT *
