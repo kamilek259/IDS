@@ -22,6 +22,8 @@ drop sequence rezervace_seq;
 drop sequence vypujcka_seq;
 drop trigger deleted_autor;
 drop trigger deleted_uzivatel;
+drop index autor_prijmeni;
+
 
 ---------------------CREATE SQEUENCE----------------------
 
@@ -389,6 +391,20 @@ SELECT *
 
 ---------------------EXPLAIN PLAN----------------------
 --Kteri autori napsali vice nez jednu knihu a kolik jich napsali?
+EXPLAIN PLAN FOR
+SELECT A.jmeno, A.prijmeni, COUNT(N.id_dilo) pocet
+FROM Autor A, Napsal N
+WHERE A.id_autor = N.id_autor
+GROUP BY A.id_autor, A.jmeno, A.prijmeni
+HAVING COUNT(N.id_dilo)>1
+ORDER BY A.prijmeni;
+--vypis
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+--INDEX pro prijmeni (rychlejsi vyhledavani)
+CREATE INDEX autor_prijmeni ON Autor (prijmeni);
+
+--znovu vytvoreni explain plan
 EXPLAIN PLAN FOR
 SELECT A.jmeno, A.prijmeni, COUNT(N.id_dilo) pocet
 FROM Autor A, Napsal N
