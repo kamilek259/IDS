@@ -473,17 +473,48 @@ GRANT ALL ON Vypujcka TO xbilko03;
 GRANT ALL ON Vypujcena TO xbilko03;
 
 ---------------------MATERIALIZOVANY POHLED----------------------
-DROP MATERIALIZED VIEW LOG ON Uzivatel;
-CREATE MATERIALIZED VIEW LOG ON Uzivatel;
+DROP MATERIALIZED VIEW LOG ON Autor;
+CREATE MATERIALIZED VIEW LOG ON Autor;
 
-DROP MATERIALIZED VIEW Mv1;
-CREATE MATERIALIZED VIEW  Mv1
+DROP MATERIALIZED VIEW AutorMv;
+CREATE MATERIALIZED VIEW  AutorMv
 BUILD IMMEDIATE
 REFRESH FAST
 ON DEMAND
 DISABLE QUERY REWRITE
 AS
 SELECT *
-FROM Uzivatel;
+FROM Autor;
 
+--TESTOVANI MATERIALIZOVANEHO POHLEDU
+
+--SeeAuthorList(BeforeFirstInsert)
+SELECT *
+FROM AutorMv WHERE jmeno IS NOT NULL;
+--Pred vlozenim vidime jenom 5 autoru
+
+insert into Autor (jmeno, prijmeni, datum_narozeni, narodnost) values('Erich', 'von Daniken',date '1935-04-14', 'Svycarsko');
+
+--SeeAuthorList(AfterFirstInsert)
+SELECT *
+FROM AutorMv WHERE jmeno IS NOT NULL;
+--Vlozili jsme noveho autora, no my porad vidime jenom 5 autoru
+
+BEGIN
+    DBMS_MVIEW.REFRESH('AutorMv');
+END;
+
+--SeeAuthorList(AfterRefresh)
+SELECT *
+FROM AutorMv WHERE jmeno IS NOT NULL;
+--Po refreshnuti konecne vidime sesteho autora
+
+insert into Autor (jmeno, prijmeni, datum_narozeni, narodnost) values('Jordan', 'Peterson',date '1962-06-12', 'Kanada');
+
+--SeeAuthorList(AfterSecondInsert)
+SELECT *
+FROM AutorMv WHERE jmeno IS NOT NULL;
+--Po vlozeni noveho autora stejne vidime jenom prvnich 6, protoze materializovany pohled nebyl aktualizovan
+
+--TESTOVANI MATERIALIZOVANEHO POHLEDU
 
