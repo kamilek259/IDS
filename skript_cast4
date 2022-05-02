@@ -457,21 +457,6 @@ ORDER BY A.prijmeni;
 --vypis
 SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
 
----------------------PRISTUPOVA PRAVA PRO DRUHEHO CLENA TYMU----------------------
---Definice pristupovych prav
-GRANT ALL ON Autor TO xbilko03;
-GRANT ALL ON Zanr TO xbilko03;
-GRANT ALL ON Dilo TO xbilko03;
-GRANT ALL ON Casopis TO xbilko03;
-GRANT ALL ON Kniha TO xbilko03;
-GRANT ALL ON Napsal TO xbilko03;
-GRANT ALL ON Uzivatel TO xbilko03;
-GRANT ALL ON Ctenar TO xbilko03;
-GRANT ALL ON Pracovnik TO xbilko03;
-GRANT ALL ON Rezervace TO xbilko03;
-GRANT ALL ON Rezervovana TO xbilko03;
-GRANT ALL ON Vypujcka TO xbilko03;
-GRANT ALL ON Vypujcena TO xbilko03;
 
 ---------------------MATERIALIZOVANY POHLED----------------------
 DROP MATERIALIZED VIEW LOG ON Autor;
@@ -517,3 +502,24 @@ FROM AutorMv WHERE jmeno IS NOT NULL;
 
 --TESTOVANI MATERIALIZOVANEHO POHLEDU
 
+
+
+---------------------PRISTUPOVA PRAVA PRO DRUHEHO CLENA TYMU----------------------
+--Definice pristupovych prav
+GRANT ALL ON Autor TO xbilko03;
+GRANT ALL ON Zanr TO xbilko03;
+GRANT ALL ON Dilo TO xbilko03;
+GRANT ALL ON Casopis TO xbilko03;
+GRANT ALL ON Kniha TO xbilko03;
+GRANT ALL ON Napsal TO xbilko03;
+GRANT ALL ON Uzivatel TO xbilko03;
+GRANT ALL ON Ctenar TO xbilko03;
+GRANT ALL ON Pracovnik TO xbilko03;
+GRANT ALL ON Rezervace TO xbilko03;
+GRANT ALL ON Rezervovana TO xbilko03;
+GRANT ALL ON Vypujcka TO xbilko03;
+GRANT ALL ON Vypujcena TO xbilko03;
+
+GRANT EXECUTE ON PridatTelefon TO xbilko03;
+GRANT EXECUTE ON ProdluzVsechnyVypujcky TO xbilko03;
+GRANT ALL ON AutorMv TO xbilko03;
