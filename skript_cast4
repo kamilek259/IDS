@@ -1,3 +1,4 @@
+---------------------DROP----------------------
 drop TABLE Autor CASCADE CONSTRAINTS;
 drop TABLE Zanr CASCADE CONSTRAINTS;
 drop TABLE Dilo CASCADE CONSTRAINTS;
@@ -19,6 +20,10 @@ drop sequence uzivatel_seq;
 drop sequence uzivatel_cp_seq;
 drop sequence rezervace_seq;
 drop sequence vypujcka_seq;
+drop trigger deleted_autor;
+drop trigger deleted_uzivatel;
+
+---------------------CREATE SQEUENCE----------------------
 
 
 --auto increment IDcek
@@ -31,6 +36,8 @@ create sequence uzivatel_cp_seq start with 1; --pro ctenare a pracovniky
 create sequence rezervace_seq start with 1;
 create sequence vypujcka_seq start with 1;
 
+
+---------------------CREATE TABLE----------------------
 
 --vytvoreni tabulky Autor
 create TABLE Autor (
@@ -177,6 +184,29 @@ create table Vypujcena (
     CONSTRAINT FK_id_dilo_vypujcena FOREIGN KEY (id_dilo) REFERENCES Dilo,
     CONSTRAINT PK_vypujcena PRIMARY KEY (cislo_vypujcka, id_dilo)
 );
+
+-----------------------TRIGGERY----------------------
+--Trigger 1 - Po smazani autora se odstrani i zaznamy v tabulce napsal
+CREATE OR REPLACE TRIGGER deleted_autor
+    AFTER DELETE ON Autor
+    FOR EACH ROW
+BEGIN
+    DELETE FROM Napsal N WHERE N.id_autor = :old.id_autor;
+END;
+
+--Trigger 2 - Po odstaneni uzivatele se nastavi na NULL v tabulkach Rezervace a Ctenar/Pracovnik, popripade vypujcka
+CREATE OR REPLACE TRIGGER deleted_uzivatel
+    AFTER DELETE ON Uzivatel
+    FOR EACH ROW
+BEGIN
+    UPDATE Rezervace SET id_uzivatel = NULL WHERE id_uzivatel = :old.id_uzivatel;
+    DELETE FROM Ctenar WHERE id_uzivatel = :old.id_uzivatel;
+    DELETE FROM Pracovnik WHERE id_uzivatel = :old.id_uzivatel;
+    UPDATE Vypujcka SET id_uzivatel = NULL WHERE id_uzivatel = :old.id_uzivatel;
+END;
+
+---------------------NAPLNENI TABULEK UKAZKOVYMI DATY----------------------
+
 --vlozeni do tabulky zanr
 insert into Zanr (nazev_zanr) values('Roman');
 insert into Zanr (nazev_zanr) values('Pohadka');
@@ -248,25 +278,8 @@ insert into Vypujcena values('1', '1');
 insert into Vypujcka (datum_vypujcka, id_uzivatel) values(date '2022-03-27', '1');
 insert into Vypujcena values('2', '3');
 
---4. cast
---Trigger 1 - Po smazani autora se odstrani i dila, ktera napsal (pouze pokud je napsal sam)
-CREATE OR REPLACE TRIGGER deleted_autor
-    AFTER DELETE ON Autor
-    FOR EACH ROW
-BEGIN
-    DELETE FROM Napsal N WHERE N.id_autor = :old.id_autor;
-END;
+---------------------TESTOVANI TRIGGERU----------------------
 
---Trigger 2 - Po odstaneni uzivatele se nastavi na NULL v tabulkach Rezervace a Ctenar/Pracovnik, popripade vypujcka
-CREATE OR REPLACE TRIGGER deleted_uzivatel
-    AFTER DELETE ON Uzivatel
-    FOR EACH ROW
-BEGIN
-    UPDATE Rezervace SET id_uzivatel = NULL WHERE id_uzivatel = :old.id_uzivatel;
-    DELETE FROM Ctenar WHERE id_uzivatel = :old.id_uzivatel;
-    DELETE FROM Pracovnik WHERE id_uzivatel = :old.id_uzivatel;
-    UPDATE Vypujcka SET id_uzivatel = NULL WHERE id_uzivatel = :old.id_uzivatel;
-END;
 
 --TESTOVANI ODSTRANENI AUTORA
 
@@ -307,3 +320,35 @@ SELECT id_uzivatel, cislo_vypujcka
 FROM Vypujcka;
 
 --TESTOVANI ODSTRANENI UZIVATELE
+
+---------------------EXPLAIN PLAN----------------------
+--Kteri autori napsali vice nez jednu knihu a kolik jich napsali?
+EXPLAIN PLAN FOR
+SELECT A.jmeno, A.prijmeni, COUNT(N.id_dilo) pocet
+FROM Autor A, Napsal N
+WHERE A.id_autor = N.id_autor
+GROUP BY A.id_autor, A.jmeno, A.prijmeni
+HAVING COUNT(N.id_dilo)>1
+ORDER BY A.prijmeni;
+--vypis
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+
+---------------------MATERIALIZOVANY POHLED----------------------
+
+---------------------PRISTUPOVA PRAVA PRO DRUHEHO CLENA TYMU----------------------
+--Definice pristupovych prav
+GRANT ALL ON Autor TO xbilko03;
+GRANT ALL ON Zanr TO xbilko03;
+GRANT ALL ON Dilo TO xbilko03;
+GRANT ALL ON Casopis TO xbilko03;
+GRANT ALL ON Kniha TO xbilko03;
+GRANT ALL ON Napsal TO xbilko03;
+GRANT ALL ON Uzivatel TO xbilko03;
+GRANT ALL ON Ctenar TO xbilko03;
+GRANT ALL ON Pracovnik TO xbilko03;
+GRANT ALL ON Rezervace TO xbilko03;
+GRANT ALL ON Rezervovana TO xbilko03;
+GRANT ALL ON Vypujcka TO xbilko03;
+GRANT ALL ON Vypujcena TO xbilko03;
+
+
