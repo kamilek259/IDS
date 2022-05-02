@@ -262,6 +262,27 @@ BEGIN
     END IF;
 END;
 
+--Procedure 1 - Prodlouzeni vsech vypujcek
+CREATE OR REPLACE PROCEDURE ProdluzVsechnyVypujcky(dayCount NUMBER)
+    IS
+BEGIN
+    DECLARE
+        CURSOR VypujckaCursor IS SELECT * from Vypujcka;
+        vypujckaRow Vypujcka%ROWTYPE;
+
+        BEGIN
+            OPEN VypujckaCursor;
+                LOOP
+                    FETCH VypujckaCursor INTO vypujckaRow;
+                    EXIT WHEN VypujckaCursor%NOTFOUND;
+                    UPDATE Vypujcka
+                    SET datum_navrat = vypujckaRow.datum_navrat + dayCount --POZOR NA DAYCOUND = NULL
+                    WHERE cislo_vypujcka = vypujckaRow.cislo_vypujcka;
+                END LOOP;
+            CLOSE VypujckaCursor;
+        END;
+END;
+
 ---------------------NAPLNENI TABULEK UKAZKOVYMI DATY----------------------
 
 --vlozeni do tabulky zanr
@@ -389,6 +410,23 @@ SELECT *
     FROM Uzivatel;
 --TESTOVANI PRIDANI TELEFONU
 
+--PRODLUZENI VYPJUCKY(BEFORE)
+SELECT *
+    FROM VYPUJCKA;
+
+BEGIN
+    --ProdluzVsechnyVypujcky(NULL); --Smaze vsechny datumy navratu vsech vypujcek (asi nema prakticke vyuziti)
+    ProdluzVsechnyVypujcky(1); --Prodlouzi datum navratu vsech vypujcek o 1 den
+    -- (prakticky pokud nastane necakane nemoznost odevzdat vypujcene dilo, napriklad tvrdy lockdown)
+    ProdluzVsechnyVypujcky(-1); --Stejne jako predchozi, jenom o -1 dnu
+    -- (prakticky asi jenom pro opravu preklepu pokud jsme nastavili 10dnu namisto 1)
+    ProdluzVsechnyVypujcky(7); --Stejne jako predchozi, jenom o 7 dnu
+    -- (ak je vypujcka uz vracena (datum navrat = NULL) pak nebude prodlouzena)
+END;
+
+--PRODLUZENI VYPJUCKY(AFTER)
+SELECT *
+    FROM VYPUJCKA;
 ---------------------EXPLAIN PLAN----------------------
 --Kteri autori napsali vice nez jednu knihu a kolik jich napsali?
 EXPLAIN PLAN FOR
